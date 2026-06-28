@@ -5,8 +5,15 @@ import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
 import "highlight.js/styles/github-dark.css";
 
+const SUGGESTIONS = [
+    {icon: "fa-lightbulb", text: "Explain a complex topic simply"},
+    {icon: "fa-code", text: "Help me debug my code"},
+    {icon: "fa-feather", text: "Draft a professional email"},
+    {icon: "fa-wand-magic-sparkles", text: "Brainstorm creative ideas"}
+];
+
 function Chat() {
-    const {newChat, prevChats, reply} = useContext(MyContext);
+    const {newChat, prevChats, reply, setPrompt} = useContext(MyContext);
     const [latestReply, setLatestReply] = useState(null);
 
     useEffect(() => {
@@ -31,17 +38,46 @@ function Chat() {
 
     }, [prevChats, reply])
 
+    if(newChat && (!prevChats || prevChats.length === 0)) {
+        return (
+            <div className="chat-area">
+                <div className="empty-state">
+                    <div className="empty-logo">&Sigma;</div>
+                    <h1 className="empty-title">How can I help you today?</h1>
+                    <p className="empty-subtitle">
+                        Ask anything — SigmaGPT is your modern AI assistant for ideas, code, and writing.
+                    </p>
+                    <div className="suggestions">
+                        {
+                            SUGGESTIONS.map((s, i) => (
+                                <button
+                                    key={i}
+                                    className="suggestion-card"
+                                    onClick={() => setPrompt(s.text)}
+                                >
+                                    <i className={`fa-solid ${s.icon}`}></i>
+                                    <span>{s.text}</span>
+                                </button>
+                            ))
+                        }
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <>
-            {newChat && <h1>Start a New Chat!</h1>}
+        <div className="chat-area">
             <div className="chats">
                 {
-                    prevChats?.slice(0, -1).map((chat, idx) => 
+                    prevChats?.slice(0, -1).map((chat, idx) =>
                         <div className={chat.role === "user"? "userDiv" : "gptDiv"} key={idx}>
                             {
-                                chat.role === "user"? 
-                                <p className="userMessage">{chat.content}</p> : 
-                                <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{chat.content}</ReactMarkdown>
+                                chat.role === "user"?
+                                <p className="userMessage">{chat.content}</p> :
+                                <div className="gptMessage">
+                                    <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{chat.content}</ReactMarkdown>
+                                </div>
                             }
                         </div>
                     )
@@ -52,22 +88,24 @@ function Chat() {
                         <>
                             {
                                 latestReply === null ? (
-                                    <div className="gptDiv" key={"non-typing"} >
-                                    <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{prevChats[prevChats.length-1].content}</ReactMarkdown>
-                                </div>
+                                    <div className="gptDiv" key={"non-typing"}>
+                                        <div className="gptMessage">
+                                            <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{prevChats[prevChats.length-1].content}</ReactMarkdown>
+                                        </div>
+                                    </div>
                                 ) : (
-                                    <div className="gptDiv" key={"typing"} >
-                                     <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{latestReply}</ReactMarkdown>
-                                </div>
+                                    <div className="gptDiv" key={"typing"}>
+                                        <div className="gptMessage">
+                                            <ReactMarkdown rehypePlugins={[rehypeHighlight]}>{latestReply}</ReactMarkdown>
+                                        </div>
+                                    </div>
                                 )
-
                             }
                         </>
                     )
                 }
-
             </div>
-        </>
+        </div>
     )
 }
 

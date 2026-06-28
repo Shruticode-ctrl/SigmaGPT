@@ -1,14 +1,38 @@
-* {
-    color: #ececec;
-    font-family: Roboto, 'Open Sans', 'Helvetica Neue', sans-serif;
-}
-
-body {
-    margin: 0;
-    padding: 0;
-}
-
 .app {
-    background-color: #212121;
+    position: relative;
+    height: 100vh;
+    width: 100%;
     display: flex;
+    overflow: hidden;
+    background-color: var(--bg);
+    color: var(--text);
+}
+
+/* Ambient brand glows in the background */
+.app::before,
+.app::after {
+    content: "";
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.app::before {
+    width: 520px;
+    height: 520px;
+    top: -180px;
+    right: -120px;
+    background: radial-gradient(circle, rgba(155, 92, 255, 0.22), transparent 70%);
+    animation: floatGlow 14s var(--ease) infinite;
+}
+
+.app::after {
+    width: 440px;
+    height: 440px;
+    bottom: -160px;
+    left: 180px;
+    background: radial-gradient(circle, rgba(111, 107, 255, 0.18), transparent 70%);
+    animation: floatGlow 18s var(--ease) infinite reverse;
 }
