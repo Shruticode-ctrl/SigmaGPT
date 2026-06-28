@@ -16,13 +16,20 @@ const getOpenAIAPIResponse = async(message) => {
         })
     };
 
-    try {
-        const response = await fetch("https://api.openai.com/v1/chat/completions", options);
-        const data = await response.json();
-        return data.choices[0].message.content; //reply
-    } catch(err) {
-        console.log(err);
+    const response = await fetch("https://api.openai.com/v1/chat/completions", options);
+    const data = await response.json();
+
+    if(!response.ok) {
+        const apiError = data?.error?.message || `OpenAI request failed with status ${response.status}`;
+        throw new Error(apiError);
     }
+
+    const reply = data?.choices?.[0]?.message?.content;
+    if(!reply) {
+        throw new Error("OpenAI returned an empty response");
+    }
+
+    return reply;
 }
 
 export default getOpenAIAPIResponse;
